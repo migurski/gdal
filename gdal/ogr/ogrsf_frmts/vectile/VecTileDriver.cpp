@@ -29,7 +29,7 @@
  * DEALINGS IN THE SOFTWARE.
  ****************************************************************************/
 
-#include "ogr_fgdb.h"
+#include "ogr_vectile.h"
 #include "cpl_conv.h"
 
 CPL_CVSID("$Id$");
@@ -67,44 +67,15 @@ const char *VecTileDriver::GetName()
 /*                                Open()                                */
 /************************************************************************/
 
-OGRDataSource *VecTileDriver::Open( const char* pszFilename, int bUpdate )
+OGRDataSource *VecTileDriver::Open( const char* pszURL, int bUpdate )
 
 {
-    // First check if we have to do any work.
-    int nLen = strlen(pszFilename);
-    if(! ((nLen >= 4 && EQUAL(pszFilename + nLen - 4, ".gdb")) ||
-          (nLen >= 5 && EQUAL(pszFilename + nLen - 5, ".gdb/"))) )
-        return NULL;
-
-    long hr;
-
-    /* Check that the filename is really a directory, to avoid confusion with */
-    /* Garmin MapSource - gdb format which can be a problem when the VecTile */
-    /* driver is loaded as a plugin, and loaded before the GPSBabel driver */
-    /* (http://trac.osgeo.org/osgeo4w/ticket/245) */
-    VSIStatBuf stat;
-    if( CPLStat( pszFilename, &stat ) != 0 || !VSI_ISDIR(stat.st_mode) )
-    {
-        return NULL;
-    }
-
-    Geodatabase* pGeoDatabase = new Geodatabase;
-
-    hr = ::OpenGeodatabase(StringToWString(pszFilename), *pGeoDatabase);
-
-    if (FAILED(hr) || pGeoDatabase == NULL)
-    {
-        delete pGeoDatabase;
-
-        GDBErr(hr, "Failed to open Geodatabase");
-        return NULL;
-    }
-
+    
     VecTileDataSource* pDS;
 
     pDS = new VecTileDataSource();
 
-    if(!pDS->Open( pGeoDatabase, pszFilename, bUpdate ) )
+    if(!pDS->Open( pGeoDatabase, pszURL, bUpdate ) )
     {
         delete pDS;
         return NULL;
@@ -120,85 +91,13 @@ OGRDataSource *VecTileDriver::Open( const char* pszFilename, int bUpdate )
 OGRDataSource* VecTileDriver::CreateDataSource( const char * conn,
                                                 char **papszOptions)
 {
-    long hr;
-    Geodatabase *pGeodatabase;
-    std::wstring wconn = StringToWString(conn);
-    int bUpdate = TRUE; // If we're creating, we must be writing.
-    VSIStatBuf stat;
+    
+    CPLError( CE_Failure, CPLE_AppDefined,
+                  "Creation not supported\n" );
+    return NULL;
 
-    /* We don't support options yet, so warn if they send us some */
-    if ( papszOptions )
-    {
-        /* TODO: warning, ignoring options */
-    }
-
-    /* Only accept names of form "filename.gdb" and */
-    /* also .gdb.zip to be able to return FGDB with MapServer OGR output (#4199) */
-    const char* pszExt = CPLGetExtension(conn);
-    if ( !(EQUAL(pszExt,"gdb") || EQUAL(pszExt, "zip")) )
-    {
-        CPLError( CE_Failure, CPLE_AppDefined,
-                  "FGDB data source name must use 'gdb' extension.\n" );
-        return NULL;
-    }
-
-    /* Don't try to create on top of something already there */
-    if( CPLStat( conn, &stat ) == 0 )
-    {
-        CPLError( CE_Failure, CPLE_AppDefined,
-                  "%s already exists.\n", conn );
-        return NULL;
-    }
-
-    /* Try to create the geodatabase */
-    pGeodatabase = new Geodatabase; // Create on heap so we can store it in the Datasource
-    hr = CreateGeodatabase(wconn, *pGeodatabase);
-
-    /* Handle creation errors */
-    if ( S_OK != hr )
-    {
-        const char *errstr = "Error creating geodatabase (%s).\n";
-        if ( hr == -2147220653 )
-            errstr = "File already exists (%s).\n";
-        delete pGeodatabase;
-        CPLError( CE_Failure, CPLE_AppDefined, errstr, conn );
-        return NULL;
-    }
-
-    /* Ready to embed the Geodatabase in an OGR Datasource */
-    VecTileDataSource* pDS = new VecTileDataSource();
-    if ( ! pDS->Open(pGeodatabase, conn, bUpdate) )
-    {
-        delete pDS;
-        return NULL;
-    }
-    else
-        return pDS;
 }
 
-/***********************************************************************/
-/*                        OpenGeodatabase()                            */
-/***********************************************************************/
-
-void VecTileDriver::OpenGeodatabase(std::string conn, Geodatabase** ppGeodatabase)
-{
-    *ppGeodatabase = NULL;
-
-    std::wstring wconn = StringToWString(conn);
-
-    long hr;
-
-    Geodatabase* pGeoDatabase = new Geodatabase;
-
-    if (S_OK != (hr = ::OpenGeodatabase(wconn, *pGeoDatabase)))
-    {
-        delete pGeoDatabase;
-
-        return;
-    }
-
-    *ppGeodatabase = pGeoDatabase;
-}
 
 /***********************************************************************/
 /*                         TestCapability()                            */
@@ -207,31 +106,12 @@ void VecTileDriver::OpenGeodatabase(std::string conn, Geodatabase** ppGeodatabas
 int VecTileDriver::TestCapability( const char * pszCap )
 {
     if (EQUAL(pszCap, ODrCCreateDataSource) )
-        return TRUE;
+        return FALSE;
 
     else if (EQUAL(pszCap, ODrCDeleteDataSource) )
-        return TRUE;
+        return FALSE;
 
     return FALSE;
-}
-/************************************************************************/
-/*                          DeleteDataSource()                          */
-/************************************************************************/
-
-OGRErr VecTileDriver::DeleteDataSource( const char *pszDataSource )
-{
-
-    std::wstring wstr = StringToWString(pszDataSource);
-
-    long hr;
-
-    if (S_OK != (hr = ::DeleteGeodatabase(wstr)))
-    {
-        GDBErr(hr, "Failed to delete Geodatabase");
-        return OGRERR_FAILURE;
-    }
-
-    return OGRERR_NONE;
 }
 
 /***********************************************************************/
@@ -241,7 +121,7 @@ OGRErr VecTileDriver::DeleteDataSource( const char *pszDataSource )
 void RegisterOGRVecTile()
 
 {
-    if (! GDAL_CHECK_VERSION("OGR FGDB"))
+    if (! GDAL_CHECK_VERSION("OGR VECTILE"))
         return;
     OGRSFDriverRegistrar::GetRegistrar()->RegisterDriver( new VecTileDriver );
 }
