@@ -38,14 +38,14 @@
 #include <vector>
 
 /************************************************************************/
-/*                             OGRVecTileLayer                          */
+/*                             VecTileLayer                          */
 /************************************************************************/
-class OGRVecTileDataSource;
+class VecTileDataSource;
 
-class OGRVecTileLayer : public OGRLayer
+class VecTileLayer : public OGRLayer
 {
 protected:
-    OGRVecTileDataSource* poDS;
+    VecTileDataSource* poDS;
 
     OGRFeatureDefn*    poFeatureDefn;
     OGRSpatialReference *poSRS;
@@ -71,8 +71,8 @@ protected:
     static CPLString    LaunderColName(const char* pszColName);
 
   public:
-                         OGRVecTileLayer(OGRVecTileDataSource* poDS);
-                        ~OGRVecTileLayer();
+                         VecTileLayer(VecTileDataSource* poDS);
+                        ~VecTileLayer();
 
     virtual void                ResetReading();
     virtual OGRFeature *        GetNextFeature();
@@ -101,10 +101,10 @@ protected:
 };
 
 /************************************************************************/
-/*                         OGRVecTileTableLayer                         */
+/*                         VecTileTableLayer                         */
 /************************************************************************/
 
-class OGRVecTileTableLayer : public OGRVecTileLayer
+class VecTileTableLayer : public VecTileLayer
 {
     CPLString         osTableName;
     CPLString         osTableId;
@@ -130,11 +130,11 @@ class OGRVecTileTableLayer : public OGRVecTileLayer
     std::vector<CPLString>  aosColumnInternalName;
 
     public:
-            OGRVecTileTableLayer(OGRVecTileDataSource* poDS,
+            VecTileTableLayer(VecTileDataSource* poDS,
                                  const char* pszTableName,
                                  const char* pszTableId = "",
                                  const char* pszGeomColumnName = "");
-            ~OGRVecTileTableLayer();
+            ~VecTileTableLayer();
 
     virtual void                ResetReading();
 
@@ -166,10 +166,10 @@ class OGRVecTileTableLayer : public OGRVecTileLayer
 };
 
 /************************************************************************/
-/*                        OGRVecTileResultLayer                         */
+/*                        VecTileResultLayer                         */
 /************************************************************************/
 
-class OGRVecTileResultLayer : public OGRVecTileLayer
+class VecTileResultLayer : public VecTileLayer
 {
     CPLString   osSQL;
     int         bGotAllRows;
@@ -177,9 +177,9 @@ class OGRVecTileResultLayer : public OGRVecTileLayer
     virtual int                FetchNextRows();
 
     public:
-            OGRVecTileResultLayer(OGRVecTileDataSource* poDS,
+            VecTileResultLayer(VecTileDataSource* poDS,
                                   const char* pszSQL);
-            ~OGRVecTileResultLayer();
+            ~VecTileResultLayer();
 
     virtual void                ResetReading();
 
@@ -187,10 +187,10 @@ class OGRVecTileResultLayer : public OGRVecTileLayer
 };
 
 /************************************************************************/
-/*                           OGRVecTileDataSource                       */
+/*                           VecTileDataSource                       */
 /************************************************************************/
 
-class OGRVecTileDataSource : public OGRDataSource
+class VecTileDataSource : public OGRDataSource
 {
     char*               pszName;
 
@@ -213,8 +213,8 @@ class OGRVecTileDataSource : public OGRDataSource
     static CPLStringList ParseSimpleJson(const char *pszJSon);
 
   public:
-                        OGRVecTileDataSource();
-                        ~OGRVecTileDataSource();
+        VecTileDataSource();
+        ~VecTileDataSource();
 
     int                 Open( const char * pszFilename,
                               int bUpdate );
@@ -246,13 +246,15 @@ class OGRVecTileDataSource : public OGRDataSource
 };
 
 /************************************************************************/
-/*                             OGRVecTileDriver                         */
+/*                             VecTileDriver                         */
 /************************************************************************/
 
-class OGRVecTileDriver : public OGRSFDriver
+class VecTileDriver : public OGRSFDriver
 {
   public:
-                ~OGRVecTileDriver();
+
+    VecTileDriver();
+    ~VecTileDriver();
 
     virtual const char*         GetName();
     virtual OGRDataSource*      Open( const char *, int );
@@ -261,7 +263,7 @@ class OGRVecTileDriver : public OGRSFDriver
     virtual int                 TestCapability( const char * );
 };
 
-char **OGRVecTileCSVSplitLine( const char *pszString, char chDelimiter );
-char* OGRVecTileGotoNextLine(char* pszData);
+char **VecTileCSVSplitLine( const char *pszString, char chDelimiter );
+char* VecTileGotoNextLine(char* pszData);
 
 #endif /* ndef _OGR_VecTile_H_INCLUDED */

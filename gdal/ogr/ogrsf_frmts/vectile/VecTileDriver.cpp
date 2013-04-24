@@ -73,15 +73,18 @@ OGRDataSource *VecTileDriver::Open( const char* pszURL, int bUpdate )
     
     VecTileDataSource* pDS;
 
-    pDS = new VecTileDataSource();
+    //pDS = new VecTileDataSource();
 
-    if(!pDS->Open( pGeoDatabase, pszURL, bUpdate ) )
+    /*
+    if(!pDS->Open( pszURL, bUpdate ) )
     {
         delete pDS;
         return NULL;
     }
     else
         return pDS;
+    */
+    return NULL;
 }
 
 /***********************************************************************/
