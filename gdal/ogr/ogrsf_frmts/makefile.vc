@@ -11,7 +11,7 @@ DIRLIST		=	generic geojson shape ntf sdts tiger s57 dgn mitab gml \
 			$(SDE_DIR) $(IDB_DIR) $(NAS_DIR) $(DODSDIR) \
 			$(PCIDSK_DIR) $(LIBKMLDIR) $(WFSDIR) $(SOSIDIR) $(GFTDIR) \
 			$(COUCHDBDIR) $(FGDB_DIR) $(XLSDIR) $(ODSDIR) $(XLSXDIR) \
-			$(INGRESDIR) $(ELASTICDIR) $(OSMDIR) $(VFKDIR)
+			$(INGRESDIR) $(ELASTICDIR) $(OSMDIR) $(VFKDIR) $(VECTILEDIR)
 
 PLUGINDIRLIST	=	$(PLUGIN_ARCOBJECTS_DIR) \
 			$(PLUGIN_DWG_DIR) \
@@ -165,6 +165,11 @@ SOSI_OBJ = sosi\*.obj
 !IFDEF CURL_LIB
 GFTDIR = gft
 GFT_OBJ = gft\*.obj
+!ENDIF
+
+!IFDEF CURL_LIB
+VECTILEDIR = vectile
+VECTILE_OBJ = vectile\*.obj
 !ENDIF
 
 !IFDEF CURL_LIB
