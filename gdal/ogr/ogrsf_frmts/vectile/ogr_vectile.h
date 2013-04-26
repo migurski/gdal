@@ -192,57 +192,69 @@ class VecTileResultLayer : public VecTileLayer
 
 class VecTileDataSource : public OGRDataSource
 {
-    char*               pszName;
+public:
 
-    OGRLayer**          papoLayers;
-    int                 nLayers;
+    VecTileDataSource();
+    ~VecTileDataSource();
 
-    int                 bReadWrite;
+    //
+    // OGRDataSource Interface
+    //
+    int Open( const char* pszSource, int bUpdate );
+    const char* GetName();
+    int GetLayerCount();
+    OGRLayer* GetLayer( int nLayer );
+    int TestCapability( const char* pszCap );
 
-    int                 bUseHTTPS;
+    //
+    // VecTileDataSource Interface
+    //
 
-    CPLString           osAuth;
-    CPLString           osAccessToken;
-    CPLString           osRefreshToken;
-    CPLString           osAPIKey;
+    enum GeometryTranslation
+    {
+        eGeometryPreserve,
+        eGeometryAsCollection,
+    };
+    
+    void SetGeometryTranslation( GeometryTranslation type );
 
-    void                DeleteLayer( const char *pszLayerName );
+    enum AttributesTranslation
+    {
+        eAtributesPreserve,
+        eAtributesSkip
+    };
 
-    int                 bMustCleanPersistant;
+    void SetAttributesTranslation( AttributesTranslation type );
 
-    static CPLStringList ParseSimpleJson(const char *pszJSon);
+    /*
+    int  GetFpOutputIsSeekable() const { return _bFpOutputIsSeekable; }
+    int  GetBBOXInsertLocation() const { return _nBBOXInsertLocation; }
+    */
 
-  public:
-        VecTileDataSource();
-        ~VecTileDataSource();
+private:
 
-    int                 Open( const char * pszFilename,
-                              int bUpdate );
+    //
+    // Private data members
+    //
+    char* _pszName;
+    char* _pszGeoData;
+    OGRLayer** _papoLayers;
+    int _nLayers;
+    VSILFILE* _fpOut;
+    
+    //
+    // Translation/Creation control flags
+    // 
+    GeometryTranslation _flTransGeom;
+    AttributesTranslation _flTransAttrs;
 
-    virtual const char* GetName() { return pszName; }
+    int _bFpOutputIsSeekable;
+    int _nBBOXInsertLocation;
 
-    virtual int         GetLayerCount() { return nLayers; }
-    virtual OGRLayer*   GetLayer( int );
-    virtual OGRLayer    *GetLayerByName(const char *);
-
-    virtual int         TestCapability( const char * );
-
-    virtual OGRLayer   *CreateLayer( const char *pszName,
-                                     OGRSpatialReference *poSpatialRef = NULL,
-                                     OGRwkbGeometryType eGType = wkbUnknown,
-                                     char ** papszOptions = NULL );
-    virtual OGRErr      DeleteLayer(int);
-
-    virtual OGRLayer*  ExecuteSQL( const char *pszSQLCommand,
-                                   OGRGeometry *poSpatialFilter,
-                                   const char *pszDialect );
-    virtual void       ReleaseResultSet( OGRLayer * poLayer );
-
-    const CPLString&            GetAccessToken() const { return osAccessToken;}
-    const char*                 GetAPIURL() const;
-    int                         IsReadWrite() const { return bReadWrite; }
-    char**                      AddHTTPOptions(char** papszOptions = NULL);
-    CPLHTTPResult*              RunSQL(const char* pszUnescapedSQL);
+    //
+    // Private utility functions
+    //
+    VecTileLayer* LoadLayer();
 };
 
 /************************************************************************/

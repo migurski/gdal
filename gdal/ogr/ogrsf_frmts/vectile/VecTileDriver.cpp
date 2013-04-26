@@ -79,6 +79,8 @@ OGRDataSource *VecTileDriver::Open( const char* pszURL, int bUpdate )
         return NULL;
     }
     
+    printf( "VecTile says hello\n" );
+
     return pDS;
 }
 
