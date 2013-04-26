@@ -38,7 +38,7 @@
 #include <vector>
 
 /************************************************************************/
-/*                             VecTileLayer                          */
+/*                             VecTileLayer                             */
 /************************************************************************/
 class VecTileDataSource;
 
@@ -101,7 +101,7 @@ protected:
 };
 
 /************************************************************************/
-/*                         VecTileTableLayer                         */
+/*                         VecTileTableLayer                            */
 /************************************************************************/
 
 class VecTileTableLayer : public VecTileLayer
@@ -166,7 +166,7 @@ class VecTileTableLayer : public VecTileLayer
 };
 
 /************************************************************************/
-/*                        VecTileResultLayer                         */
+/*                        VecTileResultLayer                            */
 /************************************************************************/
 
 class VecTileResultLayer : public VecTileLayer
@@ -187,7 +187,7 @@ class VecTileResultLayer : public VecTileLayer
 };
 
 /************************************************************************/
-/*                           VecTileDataSource                       */
+/*                           VecTileDataSource                          */
 /************************************************************************/
 
 class VecTileDataSource : public OGRDataSource
@@ -246,7 +246,7 @@ class VecTileDataSource : public OGRDataSource
 };
 
 /************************************************************************/
-/*                             VecTileDriver                         */
+/*                             VecTileDriver                            */
 /************************************************************************/
 
 class VecTileDriver : public OGRSFDriver
