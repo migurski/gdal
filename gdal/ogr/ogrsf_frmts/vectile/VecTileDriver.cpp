@@ -71,20 +71,15 @@ OGRDataSource *VecTileDriver::Open( const char* pszURL, int bUpdate )
 
 {
     
-    VecTileDataSource* pDS;
+    VecTileDataSource* pDS = new VecTileDataSource();
 
-    //pDS = new VecTileDataSource();
-
-    /*
     if(!pDS->Open( pszURL, bUpdate ) )
     {
         delete pDS;
         return NULL;
     }
-    else
-        return pDS;
-    */
-    return NULL;
+    
+    return pDS;
 }
 
 /***********************************************************************/
@@ -108,11 +103,7 @@ OGRDataSource* VecTileDriver::CreateDataSource( const char * conn,
 
 int VecTileDriver::TestCapability( const char * pszCap )
 {
-    if (EQUAL(pszCap, ODrCCreateDataSource) )
-        return FALSE;
-
-    else if (EQUAL(pszCap, ODrCDeleteDataSource) )
-        return FALSE;
+    // very uncapable server
 
     return FALSE;
 }
